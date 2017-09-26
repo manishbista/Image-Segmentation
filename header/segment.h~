@@ -1,0 +1,69 @@
+
+#ifndef SEGMENT_H
+#define SEGMENT_H
+#include <iostream>
+#include <vector>
+#include "disjointSet.h"
+#include "region.h"
+
+struct edge{
+ float weight;
+ int nodeA, nodeB;
+ edge(): weight(1.5), nodeA(-1), nodeB(-1) {}
+ void DisplayEdge();
+};
+
+struct similarity
+{
+	int firstRegionID, secondRegionID;
+	float similarityMeasure;
+	similarity(int fID, int sID, float measure) : firstRegionID(fID), secondRegionID(sID), similarityMeasure(measure) {}
+
+};
+
+class segment
+{
+ private:
+ edge* pEdge;
+ universe* uni;
+ unsigned char* segmentSpace;
+ float*** segmentColorHistogram;
+ float*** segmentTextureHistogram;
+ rect** bBox;
+ region** Regions;
+ std::vector<similarity>similarRegions;
+
+ unsigned int num_edges;
+ int SCREEN_WIDTH, SCREEN_HEIGHT;
+ float calculateThreshold(int size, int c){ return (float)c/size;}
+ int thresholdConstant;
+ int minimumSize;
+ float* threshold;
+
+bool isIntersecting(int firstRegionID, int secondRegionID);
+float calcSimOfColor(int firstRegionID, int secondRegionID);
+float calcSimOfTexture(int firstRegionID, int secondRegionID);
+float calcSimOfSize(int firstRegionID, int secondRegionID);
+float calcSimOfRect(int firstRegionID, int secondRegionID);
+float calculateSimilarity(int firstRegionID, int secondRegionID);
+float mergeHistogram(float** firstHist, float** secondHist, int numBins, int firstSize, int secondSize);
+int mergeRegions(int firstRegionID, int secondRegionID, int sortCount);
+int trackParentOf(int regionID);
+
+ public:
+ segment(int SCREEN_WIDTH, int SCREEN_HEIGHT, int thresConst, int minSize);
+ void fillEdges(float*, float*);
+ void fillRegions(unsigned char*, unsigned char*, unsigned char*);
+ void segmentGraph();
+ unsigned char* getSegmentedSpace() {return segmentSpace;}
+ ~segment();
+ void drawBoundingBox(int, int, unsigned char*);
+ int proposalCount;
+};
+
+
+
+
+#endif
+
+
